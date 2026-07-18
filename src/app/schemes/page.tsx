@@ -3,6 +3,8 @@
 import React, { Suspense, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { useApp } from "@/context/AppContext";
+import { t } from "@/lib/translations";
 import { 
   Search, SlidersHorizontal, Grid, List, Landmark, 
   RefreshCw, MapPin, Calendar, CheckCircle2, UserCheck, 
@@ -30,15 +32,16 @@ interface Scheme {
 }
 
 function SchemesContent() {
+  const { language } = useApp();
   const searchParams = useSearchParams();
   const router = useRouter();
 
   // Loading States
   const [loading, setLoading] = useState(true);
   const [schemes, setSchemes] = useState<Scheme[]>([]);
-  const [states, setStates] = useState<{ id: string; name: string }[]>([]);
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
-  const [departments, setDepartments] = useState<{ id: string; name: string }[]>([]);
+  const [states, setStates] = useState<{ id: string; name: string; slug: string }[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string; slug: string; icon?: string | null; description?: string | null }[]>([]);
+  const [departments, setDepartments] = useState<{ id: string; name: string; slug: string }[]>([]);
 
   // Search & Filter State
   const [search, setSearch] = useState(searchParams.get("search") || "");
@@ -146,9 +149,9 @@ function SchemesContent() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
       {/* Breadcrumb */}
       <nav className="flex items-center space-x-1.5 text-xs text-text-muted mb-6">
-        <Link href="/" className="hover:underline">Home</Link>
+        <Link href="/" className="hover:underline">{t("home", language)}</Link>
         <ChevronRight className="h-3 w-3" />
-        <span className="font-semibold text-foreground">Schemes</span>
+        <span className="font-semibold text-foreground">{t("schemes", language)}</span>
       </nav>
 
       <div className="flex flex-col lg:flex-row gap-8 items-start">
@@ -158,44 +161,44 @@ function SchemesContent() {
           <div className="flex items-center justify-between border-b border-border pb-3">
             <span className="font-extrabold text-base text-primary-navy dark:text-foreground flex items-center space-x-1.5">
               <SlidersHorizontal className="h-4 w-4" />
-              <span>Filter Options</span>
+              <span>{t("filters", language)}</span>
             </span>
             <button
               onClick={resetFilters}
               className="text-xs text-accent-blue font-bold hover:underline"
             >
-              Reset All
+              {t("clearAll", language)}
             </button>
           </div>
 
           <div className="space-y-4">
             {/* Gov Level */}
             <div className="space-y-1">
-              <label className="text-xs font-bold text-text-muted">Government Level</label>
+              <label className="text-xs font-bold text-text-muted">{t("govLevel", language)}</label>
               <select
                 value={level}
                 onChange={(e) => setLevel(e.target.value)}
                 className="w-full bg-background border border-border text-foreground px-3 py-2 rounded-lg text-sm outline-none"
               >
-                <option value="">All Governments</option>
-                <option value="CENTRAL">Central Government</option>
-                <option value="STATE">State Government</option>
-                <option value="UT">Union Territory</option>
+                <option value="">{language === "hi" ? "सभी सरकारें" : "All Governments"}</option>
+                <option value="CENTRAL">{t("central", language)}</option>
+                <option value="STATE">{t("stateLevel", language)}</option>
+                <option value="UT">{language === "hi" ? "केंद्र शासित प्रदेश" : "Union Territory"}</option>
               </select>
             </div>
 
             {/* State */}
             {(level === "STATE" || level === "UT" || !level) && (
               <div className="space-y-1">
-                <label className="text-xs font-bold text-text-muted">State / UT</label>
+                <label className="text-xs font-bold text-text-muted">{t("selectState", language)}</label>
                 <select
                   value={stateId}
                   onChange={(e) => setStateId(e.target.value)}
                   className="w-full bg-background border border-border text-foreground px-3 py-2 rounded-lg text-sm outline-none"
                 >
-                  <option value="">All States / UTs</option>
+                  <option value="">{language === "hi" ? "सभी राज्य / केंद्र शासित प्रदेश" : "All States / UTs"}</option>
                   {states.map((st) => (
-                    <option key={st.id} value={st.id}>{st.name}</option>
+                    <option key={st.id} value={st.id}>{t(`state_${st.slug}`, language) || st.name}</option>
                   ))}
                 </select>
               </div>
@@ -203,28 +206,28 @@ function SchemesContent() {
 
             {/* Category */}
             <div className="space-y-1">
-              <label className="text-xs font-bold text-text-muted">Category / Sector</label>
+              <label className="text-xs font-bold text-text-muted">{t("selectCategory", language)}</label>
               <select
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
                 className="w-full bg-background border border-border text-foreground px-3 py-2 rounded-lg text-sm outline-none"
               >
-                <option value="">All Categories</option>
+                <option value="">{language === "hi" ? "सभी श्रेणियां" : "All Categories"}</option>
                 {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  <option key={cat.id} value={cat.id}>{t(cat.slug, language) || cat.name}</option>
                 ))}
               </select>
             </div>
 
             {/* Department */}
             <div className="space-y-1">
-              <label className="text-xs font-bold text-text-muted">Ministry / Department</label>
+              <label className="text-xs font-bold text-text-muted">{language === "hi" ? "मंत्रालय / विभाग" : "Ministry / Department"}</label>
               <select
                 value={deptId}
                 onChange={(e) => setDeptId(e.target.value)}
                 className="w-full bg-background border border-border text-foreground px-3 py-2 rounded-lg text-sm outline-none"
               >
-                <option value="">All Ministries</option>
+                <option value="">{language === "hi" ? "सभी मंत्रालय" : "All Ministries"}</option>
                 {departments.map((d) => (
                   <option key={d.id} value={d.id}>{d.name}</option>
                 ))}
@@ -233,31 +236,31 @@ function SchemesContent() {
 
             {/* Age */}
             <div className="space-y-1">
-              <label className="text-xs font-bold text-text-muted">Your Age (Years)</label>
+              <label className="text-xs font-bold text-text-muted">{language === "hi" ? "आपकी आयु (वर्ष)" : "Your Age (Years)"}</label>
               <input
                 type="number"
                 value={age}
                 onChange={(e) => setAge(e.target.value)}
-                placeholder="Enter age"
+                placeholder={language === "hi" ? "आयु दर्ज करें" : "Enter age"}
                 className="w-full bg-background border border-border text-foreground px-3 py-2 rounded-lg text-sm outline-none"
               />
             </div>
 
             {/* Income */}
             <div className="space-y-1">
-              <label className="text-xs font-bold text-text-muted">Annual Income (Rs.)</label>
+              <label className="text-xs font-bold text-text-muted">{t("incomeLimit", language)}</label>
               <input
                 type="number"
                 value={income}
                 onChange={(e) => setIncome(e.target.value)}
-                placeholder="Enter family income"
+                placeholder={language === "hi" ? "पारिवारिक आय दर्ज करें" : "Enter family income"}
                 className="w-full bg-background border border-border text-foreground px-3 py-2 rounded-lg text-sm outline-none"
               />
             </div>
 
             {/* Caste */}
             <div className="space-y-1">
-              <label className="text-xs font-bold text-text-muted">Category / Caste</label>
+              <label className="text-xs font-bold text-text-muted">{t("caste", language)}</label>
               <select
                 value={caste}
                 onChange={(e) => setCaste(e.target.value)}
@@ -288,7 +291,7 @@ function SchemesContent() {
 
             {/* Social status checkboxes */}
             <div className="space-y-2 border-t border-border pt-4">
-              <span className="text-xs font-bold text-text-muted block">Demographic Status</span>
+              <span className="text-xs font-bold text-text-muted block">{t("beneficiaryFilters", language)}</span>
               
               <label className="flex items-center space-x-2 text-xs font-semibold text-foreground cursor-pointer">
                 <input
@@ -297,7 +300,7 @@ function SchemesContent() {
                   onChange={(e) => setFarmer(e.target.checked)}
                   className="rounded accent-accent-saffron h-4 w-4"
                 />
-                <span>Farmer</span>
+                <span>{language === "hi" ? "किसान" : "Farmer"}</span>
               </label>
 
               <label className="flex items-center space-x-2 text-xs font-semibold text-foreground cursor-pointer">
@@ -307,7 +310,7 @@ function SchemesContent() {
                   onChange={(e) => setStudent(e.target.checked)}
                   className="rounded accent-accent-saffron h-4 w-4"
                 />
-                <span>Student</span>
+                <span>{language === "hi" ? "छात्र" : "Student"}</span>
               </label>
 
               <label className="flex items-center space-x-2 text-xs font-semibold text-foreground cursor-pointer">
@@ -317,7 +320,7 @@ function SchemesContent() {
                   onChange={(e) => setSenior(e.target.checked)}
                   className="rounded accent-accent-saffron h-4 w-4"
                 />
-                <span>Senior Citizen</span>
+                <span>{language === "hi" ? "वरिष्ठ नागरिक" : "Senior Citizen"}</span>
               </label>
 
               <label className="flex items-center space-x-2 text-xs font-semibold text-foreground cursor-pointer">
@@ -327,7 +330,7 @@ function SchemesContent() {
                   onChange={(e) => setDisabled(e.target.checked)}
                   className="rounded accent-accent-saffron h-4 w-4"
                 />
-                <span>Disabled (PwD)</span>
+                <span>{language === "hi" ? "दिव्यांग (PwD)" : "Disabled (PwD)"}</span>
               </label>
 
               <label className="flex items-center space-x-2 text-xs font-semibold text-foreground cursor-pointer">
@@ -337,7 +340,7 @@ function SchemesContent() {
                   onChange={(e) => setBpl(e.target.checked)}
                   className="rounded accent-accent-saffron h-4 w-4"
                 />
-                <span>Below Poverty Line (BPL)</span>
+                <span>{language === "hi" ? "गरीबी रेखा से नीचे (BPL)" : "Below Poverty Line (BPL)"}</span>
               </label>
             </div>
           </div>
@@ -353,7 +356,7 @@ function SchemesContent() {
               <Search className="h-4 w-4 text-gray-400 mr-2 flex-shrink-0" />
               <input
                 type="text"
-                placeholder="Search Aadhaar, PM Kisan, scholarships..."
+                placeholder={t("searchPlaceholder", language)}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full bg-transparent border-none outline-none text-sm placeholder:text-gray-400 text-foreground"
@@ -371,14 +374,14 @@ function SchemesContent() {
                 <button
                   onClick={() => setViewMode("grid")}
                   className={`p-1.5 rounded transition ${viewMode === "grid" ? "bg-card text-accent-saffron shadow-sm" : "text-gray-400 hover:text-foreground"}`}
-                  title="Grid View"
+                  title={language === "hi" ? "ग्रिड दृश्य" : "Grid View"}
                 >
                   <Grid className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
                   className={`p-1.5 rounded transition ${viewMode === "list" ? "bg-card text-accent-saffron shadow-sm" : "text-gray-400 hover:text-foreground"}`}
-                  title="List View"
+                  title={language === "hi" ? "सूची दृश्य" : "List View"}
                 >
                   <List className="h-4 w-4" />
                 </button>
@@ -389,9 +392,9 @@ function SchemesContent() {
                 onChange={(e) => setSort(e.target.value)}
                 className="bg-background border border-border text-foreground px-3 py-2 rounded-lg text-sm outline-none"
               >
-                <option value="az">A to Z</option>
-                <option value="newest">Newest Added</option>
-                <option value="recent">Recently Updated</option>
+                <option value="az">{language === "hi" ? "अ से ज्ञ (A-Z)" : "A to Z"}</option>
+                <option value="newest">{language === "hi" ? "नवीनतम जोड़े गए" : "Newest Added"}</option>
+                <option value="recent">{language === "hi" ? "हाल ही में अद्यतन" : "Recently Updated"}</option>
               </select>
 
               {/* Mobile Filter Button */}
@@ -400,7 +403,7 @@ function SchemesContent() {
                 className="lg:hidden p-2 rounded-lg border border-border text-foreground hover:bg-card-secondary flex items-center space-x-1"
               >
                 <SlidersHorizontal className="h-4 w-4" />
-                <span className="text-xs font-bold">Filters</span>
+                <span className="text-xs font-bold">{t("filters", language)}</span>
               </button>
             </div>
 
@@ -456,17 +459,17 @@ function SchemesContent() {
                     <div className="space-y-3 flex-grow">
                       <div className="flex flex-wrap gap-1.5 items-center text-[10px] font-bold">
                         <span className="text-accent-saffron bg-accent-saffron/10 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                          {scheme.governmentLevel === "CENTRAL" ? "Central" : scheme.state?.name || "State"}
+                          {scheme.governmentLevel === "CENTRAL" ? (language === "hi" ? "केंद्रीय" : "Central") : (scheme.state ? (t(`state_${scheme.state.slug}`, language) || scheme.state.name) : (language === "hi" ? "राज्य" : "State"))}
                         </span>
                         {scheme.category && (
                           <span className="text-[#64748B] dark:text-[#94A3B8] bg-card-secondary px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                            {scheme.category.name}
+                            {t(scheme.category.name.toLowerCase().replace(/\s+/g, "-"), language) || scheme.category.name}
                           </span>
                         )}
                         {scheme.verificationStatus === "VERIFIED" && (
                           <span className="text-accent-green bg-accent-green/10 px-2.5 py-0.5 rounded-full flex items-center space-x-0.5">
                             <CheckCircle2 className="h-3 w-3 fill-current" />
-                            <span>VERIFIED OFFICIAL LINK</span>
+                            <span>{language === "hi" ? "सत्यापित आधिकारिक स्रोत" : "VERIFIED OFFICIAL SOURCE"}</span>
                           </span>
                         )}
                       </div>
@@ -483,7 +486,7 @@ function SchemesContent() {
                       {benefits.length > 0 && (
                         <div className="pt-2">
                           <span className="text-xs font-semibold text-text-muted">
-                            Main Benefit: <span className="font-extrabold text-accent-green">{benefits[0]}</span>
+                            {language === "hi" ? "मुख्य लाभ:" : "Main Benefit:"} <span className="font-extrabold text-accent-green">{benefits[0]}</span>
                           </span>
                         </div>
                       )}
@@ -496,7 +499,7 @@ function SchemesContent() {
                         href={`/schemes/${scheme.slug}`}
                         className="flex-grow text-center text-xs bg-primary-navy text-white dark:bg-card-secondary dark:text-foreground dark:hover:bg-accent-saffron dark:hover:text-primary-navy py-2 px-3 rounded-lg font-bold hover:bg-primary-navy/95 transition duration-150"
                       >
-                        Preview Scheme
+                        {language === "hi" ? "योजना विवरण" : "Preview Scheme"}
                       </Link>
                       
                       {scheme.officialApplyUrl ? (
@@ -506,12 +509,12 @@ function SchemesContent() {
                           rel="noopener noreferrer"
                           className="flex items-center justify-center text-xs border border-border hover:bg-card-secondary py-2 px-3 rounded-lg font-bold text-foreground transition duration-150 space-x-1"
                         >
-                          <span>Apply</span>
+                          <span>{language === "hi" ? "आवेदन करें" : "Apply"}</span>
                           <ExternalLink className="h-3 w-3" />
                         </a>
                       ) : (
                         <span className="text-xs font-bold text-text-muted py-2 px-3 text-center bg-card-secondary rounded-lg">
-                          Offline Only
+                          {language === "hi" ? "केवल ऑफ़लाइन" : "Offline Only"}
                         </span>
                       )}
                     </div>
