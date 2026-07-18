@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-card-secondary: var(--card-secondary);
+  --color-primary-navy: var(--primary-navy);
+  --color-accent-saffron: var(--accent-saffron);
+  --color-accent-green: var(--accent-green);
+  --color-accent-blue: var(--accent-blue);
+  --color-text-muted: var(--text-muted);
+  --color-border: var(--border);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  
+  --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+}
+
+:root {
+  /* Light Mode Theme */
+  --background: #F8FAFC;
+  --foreground: #111827;
+  --card: #FFFFFF;
+  --card-foreground: #111827;
+  --card-secondary: #F1F5F9;
+  --primary-navy: #0B1F3A;
+  --accent-saffron: #FF9933;
+  --accent-green: #138808;
+  --accent-blue: #2563EB;
+  --text-muted: #475569;
+  --border: #E2E8F0;
+  --success: #16A34A;
+  --warning: #F59E0B;
+  --error: #DC2626;
+}
+
+.dark {
+  /* Dark Mode Theme */
+  --background: #07111F;
+  --foreground: #F8FAFC;
+  --card: #0F172A;
+  --card-foreground: #F8FAFC;
+  --card-secondary: #111C2E;
+  --primary-navy: #0B1F3A;
+  --accent-saffron: #FDBA74;
+  --accent-green: #4ADE80;
+  --accent-blue: #60A5FA;
+  --text-muted: #CBD5E1;
+  --border: #334155;
+  --success: #4ADE80;
+  --warning: #FBBF24;
+  --error: #F87171;
+}
+
+/* Accessibility - Large Font Option */
+.large-fonts {
+  font-size: 1.125rem; /* 18px base instead of 16px */
+}
+.large-fonts h1 {
+  font-size: 2.5rem !important;
+}
+.large-fonts h2 {
+  font-size: 2rem !important;
+}
+.large-fonts h3 {
+  font-size: 1.5rem !important;
+}
+.large-fonts p, 
+.large-fonts span, 
+.large-fonts li, 
+.large-fonts a, 
+.large-fonts button, 
+.large-fonts label, 
+.large-fonts input, 
+.large-fonts select, 
+.large-fonts textarea {
+  font-size: 1.125rem !important;
+}
+
+/* Custom styles */
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Tricolor Line styles */
+.tricolor-strip {
+  height: 4px;
+  background: linear-gradient(to right, #FF9933 33.3%, #FFFFFF 33.3%, #FFFFFF 66.6%, #138808 66.6%);
+}
+
+.dark .tricolor-strip {
+  background: linear-gradient(to right, #FDBA74 33.3%, #111C2E 33.3%, #111C2E 66.6%, #4ADE80 66.6%);
+}
+
+/* Focus Ring for Keyboard Navigation */
+*:focus-visible {
+  outline: 2px solid var(--accent-saffron);
+  outline-offset: 2px;
+}

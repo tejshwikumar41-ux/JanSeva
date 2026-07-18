@@ -1,0 +1,136 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Scheme {
+  id                      String            @id @default(uuid())
+  name                    String
+  slug                    String            @unique
+  type                    String            // "SCHEME" or "SERVICE"
+  governmentLevel         String            // "CENTRAL", "STATE", "UT"
+  stateId                 String?
+  state                   State?            @relation(fields: [stateId], references: [id])
+  departmentId            String?
+  department              Department?       @relation(fields: [departmentId], references: [id])
+  categoryId              String?
+  category                Category?         @relation(fields: [categoryId], references: [id])
+  subcategory             String?
+  beneficiaryTypes        String            // comma-separated or JSON array string
+  shortDescription        String
+  fullDescription         String
+  benefits                String            // JSON array string of benefits
+  eligibilitySummary      String
+  requiredDocuments       String            // JSON array string of docs
+  onlineApplicationSteps  String            // JSON array string of steps
+  offlineApplicationSteps String            // JSON array string of steps
+  officialApplyUrl        String?
+  officialWebsiteUrl      String?
+  guidelinesPdfUrl        String?
+  trackStatusUrl          String?
+  helplineNumber          String?
+  email                   String?
+  officeAddress           String?
+  fees                    String            // "Free" or fee amount
+  processingTime          String?
+  applicationStartDate    DateTime?
+  applicationDeadline     DateTime?
+  renewalDate             DateTime?
+  status                  String            // "ACTIVE", "CLOSED", "UPCOMING"
+  verificationStatus      String            // "UNVERIFIED", "SOURCE_ADDED", "VERIFIED"
+  sourceUrls              String            // JSON array string
+  keywords                String?
+  lastUpdated             DateTime          @default(now())
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
+  faqs                    Faq[]
+  savedBy                 UserSavedScheme[]
+  sourceHistory           SourceHistory[]
+  eligibilityRules        EligibilityRule[]
+}
+
+model State {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  slug      String   @unique
+  isUT      Boolean  @default(false)
+  portalUrl String?
+  schemes   Scheme[]
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  icon        String?  // Lucide icon name
+  description String?
+  schemes     Scheme[]
+}
+
+model Department {
+  id      String   @id @default(uuid())
+  name    String   @unique
+  slug    String   @unique
+  schemes Scheme[]
+}
+
+model Faq {
+  id       String @id @default(uuid())
+  question String
+  answer   String
+  schemeId String
+  scheme   Scheme @relation(fields: [schemeId], references: [id], onDelete: Cascade)
+}
+
+model EligibilityRule {
+  id              String   @id @default(uuid())
+  schemeId        String
+  scheme          Scheme   @relation(fields: [schemeId], references: [id], onDelete: Cascade)
+  minAge          Int?
+  maxAge          Int?
+  gender          String?  // "ANY", "MALE", "FEMALE", "TRANSGENDER"
+  maxIncome       Float?
+  caste           String?  // "ANY", "GENERAL", "OBC", "SC", "ST"
+  occupation      String?  // "ANY", "FARMER", "STUDENT", "LABOUR", etc.
+  studentStatus   Boolean?
+  farmerStatus    Boolean?
+  disabledStatus  Boolean?
+  seniorStatus    Boolean?
+  bplStatus       Boolean?
+  widowStatus     Boolean?
+  minorityStatus  Boolean?
+  ruralStatus     Boolean? // rural vs urban
+  educationLevel  String?  // education level minimum
+}
+
+model UserSavedScheme {
+  id        String   @id @default(uuid())
+  userId    String
+  schemeId  String
+  scheme    Scheme   @relation(fields: [schemeId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, schemeId])
+}
+
+model AdminUser {
+  id       String @id @default(uuid())
+  username String @unique
+  password String // Hashed or plaintext for mock demo
+}
+
+model SourceHistory {
+  id        String   @id @default(uuid())
+  schemeId  String
+  scheme    Scheme   @relation(fields: [schemeId], references: [id], onDelete: Cascade)
+  editedBy  String
+  changeLog String
+  updatedAt DateTime @default(now())
+}
