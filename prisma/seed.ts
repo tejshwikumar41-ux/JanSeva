@@ -5,6 +5,10 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("Starting seed database...");
 
+  // Clear existing FAQs and eligibility rules to prevent duplication on multiple runs
+  await prisma.faq.deleteMany();
+  await prisma.eligibilityRule.deleteMany();
+
   // 1. Seed Categories
   const categoriesData = [
     { name: "Agriculture", slug: "agriculture", icon: "Sprout", description: "Schemes for farmers, agricultural loans, subsidies, and equipment." },
